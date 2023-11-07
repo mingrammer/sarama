@@ -378,6 +378,17 @@ func (h *messageHandler) ConsumeClaim(sess ConsumerGroupSession, claim ConsumerG
 	}
 	return nil
 }
+func (h *messageHandler) BatchConsumeClaim(sess ConsumerGroupSession, claim ConsumerGroupClaim) error {
+	h.started.Done()
+
+	for msgs := range claim.BatchMessages() {
+		for _, msg := range msgs {
+			h.Logf("consumed msg %v", msg)
+			h.h(msg)
+		}
+	}
+	return nil
+}
 
 func TestFuncTxnProduceAndCommitOffset(t *testing.T) {
 	checkKafkaVersion(t, "0.11.0.0")

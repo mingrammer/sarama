@@ -529,6 +529,22 @@ func (m *testFuncConsumerGroupMember) ConsumeClaim(s ConsumerGroupSession, c Con
 	return nil
 }
 
+func (m *testFuncConsumerGroupMember) BatchConsumeClaim(s ConsumerGroupSession, c ConsumerGroupClaim) error {
+	atomic.AddInt32(&m.handlers, 1)
+	defer atomic.AddInt32(&m.handlers, -1)
+
+	for msgs := range c.BatchMessages() {
+		for _, msg := range msgs {
+			if n := atomic.AddInt32(&m.maxMessages, -1); m.isCapped && n < 0 {
+				break
+			}
+			s.MarkMessage(msg, "")
+			m.sink.Push(m.clientID, msg)
+		}
+	}
+	return nil
+}
+
 func (m *testFuncConsumerGroupMember) waitFor(kind string, expected interface{}, factory func() (interface{}, error)) {
 	m.t.Helper()
 
