@@ -414,8 +414,9 @@ type Config struct {
 			// the Errors channel (default disabled).
 			Errors bool
 
-			// If enabled, ConsumerGroup will return messages on the
-			// ConsumerGroupClaim.BatchMessages() channel.
+			// If enabled, ConsumerGroup will return messages on the ConsumerGroupClaim.BatchMessages() channel,
+			// and ConsumerGroupClaim.Messages() channel will no longer return messages (default disabled).
+			// ConsumerGroupClaim.BatchMessages() and ConsumerGroupClaim.Messages() are mutually exclusive.
 			Batches bool
 		}
 
