@@ -17,7 +17,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/IBM/sarama/internal/toxiproxy"
+	"github.com/mingrammer/sarama/internal/toxiproxy"
 )
 
 const uncommittedTopic = "uncommitted-topic-test-4"

@@ -17,7 +17,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/require"
 
-	"github.com/IBM/sarama/internal/toxiproxy"
+	"github.com/mingrammer/sarama/internal/toxiproxy"
 )
 
 const TestBatchSize = 1000
