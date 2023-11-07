@@ -229,6 +229,7 @@ func (c *Consumer) ExpectConsumePartition(topic string, partition int32, offset 
 			partition:           partition,
 			offset:              offset,
 			messages:            make(chan *sarama.ConsumerMessage, c.config.ChannelBufferSize),
+			batchMessages:       make(chan []*sarama.ConsumerMessage, c.config.BatchChannelBufferSize),
 			suppressedMessages:  make(chan *sarama.ConsumerMessage, c.config.ChannelBufferSize),
 			errors:              make(chan *sarama.ConsumerError, c.config.ChannelBufferSize),
 		}
@@ -254,6 +255,7 @@ type PartitionConsumer struct {
 	partition                     int32
 	offset                        int64
 	messages                      chan *sarama.ConsumerMessage
+	batchMessages                 chan []*sarama.ConsumerMessage
 	suppressedMessages            chan *sarama.ConsumerMessage
 	suppressedHighWaterMarkOffset int64
 	errors                        chan *sarama.ConsumerError
@@ -273,6 +275,7 @@ func (pc *PartitionConsumer) AsyncClose() {
 	pc.singleClose.Do(func() {
 		close(pc.suppressedMessages)
 		close(pc.messages)
+		close(pc.batchMessages)
 		close(pc.errors)
 	})
 }
@@ -342,6 +345,11 @@ func (pc *PartitionConsumer) Errors() <-chan *sarama.ConsumerError {
 // Messages implements the Messages method from the sarama.PartitionConsumer interface.
 func (pc *PartitionConsumer) Messages() <-chan *sarama.ConsumerMessage {
 	return pc.messages
+}
+
+// BatchMessages implements the BatchMessages method from the sarama.PartitionConsumer interface.
+func (pc *PartitionConsumer) BatchMessages() <-chan []*sarama.ConsumerMessage {
+	return pc.batchMessages
 }
 
 func (pc *PartitionConsumer) HighWaterMarkOffset() int64 {
